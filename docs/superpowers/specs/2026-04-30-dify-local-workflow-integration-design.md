@@ -1,52 +1,53 @@
-# Dify Local Workflow Integration Design
+# Dify ローカルワークフロー連携 設計書
 
-## Goal
+## 目的
 
-Add a local-only Dify workflow preparation step before the existing pronunciation practice flow.
+既存の日本語発音練習アプリの前段に、Dify ワークフローで面談練習文を生成するステップを追加する。
 
-The user will enter project/interview information, upload an applicant skill sheet Excel file, run the local Dify workflow, review the generated practice text, optionally edit it, then start the existing analysis/pronunciation practice flow.
+ユーザは最初に案件情報を入力し、応募者のスキルシート Excel ファイルをアップロードする。アプリはローカル Dify API を呼び出し、Dify が生成した練習文章を画面に表示する。ユーザは生成文章を確認し、必要であれば編集してから「分析開始」を押す。その後は、現在の発音練習・録音・採点フローに進む。
 
-## Scope
+## 対象範囲
 
-This phase is local development only.
+今回はローカル開発で完成させることを優先する。
 
-- React calls the local Dify API directly.
-- Dify API base URL is `http://localhost/v1`.
-- The API key is stored only in the local `.env` file.
-- The generated Dify output is used directly as the practice text.
-- The existing pronunciation practice, recording, scoring, and retry flows remain unchanged.
+- React からローカル Dify API を直接呼び出す。
+- Dify API のベース URL は `http://localhost/v1` とする。
+- Dify API キーはローカルの `.env` のみに保存する。
+- Dify が返した文章は、そのまま練習文章として使う。
+- 既存の発音練習、録音、採点、再練習の流れは変更しない。
+- 画面文言はできるだけ日本語にする。
 
-Out of scope for this phase:
+今回は対象外にすること:
 
-- Production-safe backend proxy.
-- Supabase Function proxy for Dify.
-- GitHub Pages compatibility for the Dify workflow call.
-- Storing generated practice text.
-- Importing or editing the Dify DSL itself.
+- 本番公開向けの安全なバックエンドプロキシ。
+- Supabase Function 経由での Dify 呼び出し。
+- GitHub Pages 上での Dify 連携動作。
+- 生成文章の保存機能。
+- Dify DSL の編集やインポート機能。
 
-## Existing Context
+## 既存アプリとの接続点
 
-The current React app starts with `TextInputPanel`, which accepts raw practice text and calls `handleAnalyze(text)` in `App.tsx`.
+現在のアプリは、最初に `TextInputPanel` で練習文章を直接入力し、`App.tsx` の `handleAnalyze(text)` を呼び出して発音練習画面に進む。
 
-The new flow should preserve `handleAnalyze(text)` as the boundary into the existing app. After the user confirms the Dify-generated text, the app should call the same function used by the current direct text input path.
+新しい Dify 連携でも、既存の `handleAnalyze(text)` を発音練習フローへの入口として使う。Dify 生成文章をユーザが確認した後、その文章を `handleAnalyze(text)` に渡す。
 
-## Dify API Details
+## Dify API
 
-The app uses these local Dify endpoints:
+使用するローカル Dify API は次の2つ。
 
 ```text
 POST http://localhost/v1/files/upload
 POST http://localhost/v1/workflows/run
 ```
 
-The Dify workflow input variables are:
+Dify ワークフローの入力変数は次の2つ。
 
 ```text
 Meet
 excel_file
 ```
 
-The verified workflow request shape is:
+動作確認済みの Workflow 実行リクエスト形式:
 
 ```json
 {
@@ -63,61 +64,80 @@ The verified workflow request shape is:
 }
 ```
 
-The verified successful response contains the generated practice text at:
+成功時、Dify が生成した文章は次の場所に入る。
 
 ```text
 data.outputs.text
 ```
 
-## Environment Variables
+## 環境変数
 
-Add these local-only Vite environment variables:
+ローカルの `.env` に次の値を追加する。
 
 ```text
 VITE_DIFY_BASE_URL=http://localhost/v1
 VITE_DIFY_API_KEY=...
 ```
 
-Because `VITE_*` variables are visible in browser bundles, this is intentionally local-only. The `.env` file must remain ignored by Git.
+`VITE_*` の環境変数はブラウザ側から見えるため、この方式はローカル専用とする。`.env` は Git に含めない。
 
-## UI Flow
+## 画面フロー
 
-When no practice text has been analyzed yet, show a Dify preparation panel instead of the existing direct text input panel.
+練習文章がまだ解析されていない状態では、既存の直接入力パネルの代わりに Dify 用の入力パネルを表示する。
 
-Step 1: collect input.
+### Step 1: 案件情報と Excel を入力する
 
-- Show a textarea for `Meet`.
-- Show a file input for `excel_file`.
-- Accept Excel files, primarily `.xlsx` and `.xls`.
-- Disable the generate button until both `Meet` and a file are present.
+表示する項目:
 
-Step 2: generate text.
+- 案件情報入力欄
+- スキルシート Excel ファイル選択欄
+- 「Difyで生成」ボタン
 
-- On `Difyで生成`, upload the selected Excel file to Dify.
-- Use the returned file id in `workflows/run`.
-- Show a loading state while the request is running.
-- Show any connection, upload, workflow, or empty-output errors in the panel.
+動作:
 
-Step 3: review and start analysis.
+- 案件情報と Excel ファイルの両方が入るまで「Difyで生成」は押せない。
+- Excel は主に `.xlsx` と `.xls` を受け付ける。
 
-- Show Dify's `data.outputs.text` in an editable textarea.
-- Allow the user to modify the text before starting.
-- Disable `分析開始` if the textarea is empty.
-- On `分析開始`, call the existing `handleAnalyze(text)`.
+### Step 2: Dify で練習文章を生成する
 
-## Components
+「Difyで生成」を押したら、次の順で処理する。
+
+1. Excel ファイルを `/files/upload` に送る。
+2. 返ってきた `upload_file_id` を保持する。
+3. `Meet` と `excel_file` を `/workflows/run` に送る。
+4. `data.outputs.text` を取得する。
+5. 生成文章を確認用 textarea に表示する。
+
+処理中はローディング状態を表示する。
+
+### Step 3: 生成文章を確認して分析開始する
+
+表示する項目:
+
+- Dify 生成文章の確認・編集 textarea
+- 「分析開始」ボタン
+
+動作:
+
+- ユーザは Dify の生成文章をそのまま使ってもよい。
+- 必要であれば、画面上で文章を編集できる。
+- 文章が空の場合は「分析開始」を押せない。
+- 「分析開始」を押すと、編集後の文章を `handleAnalyze(text)` に渡す。
+- その後は既存の発音練習画面に進む。
+
+## 追加するファイル
 
 ### `src/utils/difyClient.ts`
 
-Responsibilities:
+役割:
 
-- Read `VITE_DIFY_BASE_URL` and `VITE_DIFY_API_KEY`.
-- Upload a file via `/files/upload`.
-- Run the workflow via `/workflows/run`.
-- Extract `data.outputs.text`.
-- Throw user-meaningful errors for missing config, failed upload, failed workflow, or empty output.
+- `VITE_DIFY_BASE_URL` と `VITE_DIFY_API_KEY` を読む。
+- `/files/upload` で Excel ファイルをアップロードする。
+- `/workflows/run` で Dify ワークフローを実行する。
+- `data.outputs.text` を取り出す。
+- 設定不足、アップロード失敗、Workflow 失敗、空レスポンスを分かりやすいエラーに変換する。
 
-Suggested API:
+想定 API:
 
 ```ts
 uploadDifyFile(file: File, user: string): Promise<string>
@@ -135,12 +155,12 @@ generatePracticeText(args: {
 
 ### `src/components/DifyInputPanel.tsx`
 
-Responsibilities:
+役割:
 
-- Manage `Meet`, selected Excel file, generated text, loading state, and local errors.
-- Call `generatePracticeText`.
-- Present generated text in an editable textarea.
-- Call `onAnalyze(generatedText.trim())` when the user clicks `分析開始`.
+- 案件情報、選択ファイル、生成文章、ローディング状態、エラーを管理する。
+- `generatePracticeText` を呼び出す。
+- Dify 生成文章を編集可能な textarea に表示する。
+- ユーザが「分析開始」を押したら `onAnalyze(generatedText.trim())` を呼ぶ。
 
 Props:
 
@@ -151,52 +171,73 @@ interface DifyInputPanelProps {
 }
 ```
 
+## 変更するファイル
+
 ### `src/App.tsx`
 
-Replace the initial direct input panel with `DifyInputPanel` while preserving the existing downstream flow.
+初期表示の入力パネルを `DifyInputPanel` に差し替える。
 
-Current boundary:
+現在:
 
 ```tsx
 {!parsedLines && <TextInputPanel onAnalyze={handleAnalyze} isLoading={isInitializing} />}
 ```
 
-New boundary:
+変更後:
 
 ```tsx
 {!parsedLines && <DifyInputPanel onAnalyze={handleAnalyze} isLoading={isInitializing} />}
 ```
 
-## Error Handling
+## エラー表示
 
-Display errors inside the Dify input panel.
+エラーは Dify 入力パネル内に表示する。
 
-- Missing API base URL or API key: tell the user to check `.env`.
-- Missing `Meet`: keep the generate button disabled.
-- Missing Excel file: keep the generate button disabled.
-- File upload failure: `Excelアップロードに失敗しました。`
-- Workflow failure: include Dify's error message if available.
-- Empty `data.outputs.text`: `Difyの生成文章が空です。`
-- Network failure: `Dify APIに接続できません。Difyが起動しているか確認してください。`
+- API URL または API キー未設定: `.env の Dify 設定を確認してください。`
+- 案件情報未入力: ボタンを無効化する。
+- Excel 未選択: ボタンを無効化する。
+- Excel アップロード失敗: `Excelアップロードに失敗しました。`
+- Workflow 実行失敗: Dify のエラーメッセージがあれば表示する。
+- `data.outputs.text` が空: `Difyの生成文章が空です。`
+- Dify に接続できない: `Dify APIに接続できません。Difyが起動しているか確認してください。`
 
-## Testing And Verification
+## UI 文言
 
-Automated:
+画面文言は日本語を基本にする。
 
-- Run `npm run build`.
+主な文言:
 
-Manual local verification:
+- `案件情報`
+- `案件内容や面談で確認したいポイントを入力してください`
+- `スキルシート Excel`
+- `Difyで生成`
+- `生成中...`
+- `生成文章の確認`
+- `必要であれば文章を編集してから分析を開始してください`
+- `分析開始`
 
-1. Start Dify locally.
-2. Start the React dev server.
-3. Enter sample `Meet` text.
-4. Upload `TOMATO技術者経歴書_HQ.xlsx`.
-5. Click `Difyで生成`.
-6. Confirm generated text appears in the editable textarea.
-7. Edit the text slightly.
-8. Click `分析開始`.
-9. Confirm the existing pronunciation practice screen opens.
+英語の技術用語は、必要な場合のみそのまま使う。
 
-## Future Production Path
+## 確認方法
 
-For GitHub Pages or any public deployment, replace direct browser-to-Dify calls with a backend proxy such as a Supabase Function or local server. That proxy should hold the Dify API key server-side and expose a safe application-specific endpoint to the React app.
+自動確認:
+
+```text
+npm run build
+```
+
+ローカル手動確認:
+
+1. Dify をローカルで起動する。
+2. React 開発サーバーを起動する。
+3. 案件情報を入力する。
+4. `TOMATO技術者経歴書_HQ.xlsx` をアップロードする。
+5. 「Difyで生成」を押す。
+6. 生成文章が確認 textarea に表示されることを確認する。
+7. 文章を少し編集する。
+8. 「分析開始」を押す。
+9. 既存の発音練習画面に進むことを確認する。
+
+## 将来の本番対応
+
+GitHub Pages などで公開する場合は、ブラウザから Dify API を直接呼ばない。Supabase Function または小さなバックエンドサーバーを用意し、Dify API キーはサーバー側だけに保存する。
