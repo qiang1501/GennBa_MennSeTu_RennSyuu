@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const base = '/talkGeminiPro/';
+const base = process.env.APP_BASE_PATH ?? '/talkGeminiPro/';
 const dictRoutePrefix = `${base}dict/`;
 
 const serveKuromojiDictRaw = () => ({
