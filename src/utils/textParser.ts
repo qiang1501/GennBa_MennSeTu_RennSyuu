@@ -1,4 +1,4 @@
-import kuromoji from 'kuromoji';
+import type { IpadicFeatures, Tokenizer } from 'kuromoji';
 import type { KaraokeWord, KaraokeLineData } from '../types';
 import { normalizeToKatakana } from './katakana';
 import {
@@ -8,18 +8,43 @@ import {
   type ReadingDictionary,
 } from './englishKatakana';
 
-let tokenizer: kuromoji.Tokenizer<kuromoji.IpadicFeatures> | null = null;
+type KuromojiBrowserModule = {
+  default?: {
+    builder: typeof import('kuromoji').builder;
+  };
+  builder?: typeof import('kuromoji').builder;
+};
+
+let tokenizer: Tokenizer<IpadicFeatures> | null = null;
+let kuromojiModulePromise: Promise<Required<Pick<KuromojiBrowserModule, 'builder'>>> | null = null;
+
+const loadKuromoji = async () => {
+  if (!kuromojiModulePromise) {
+    kuromojiModulePromise = import('kuromoji/build/kuromoji.js').then((module: KuromojiBrowserModule) => {
+      const builder = module.builder ?? module.default?.builder;
+      if (!builder) {
+        throw new Error('Failed to load kuromoji.');
+      }
+      return { builder };
+    });
+  }
+  return kuromojiModulePromise;
+};
 
 export const buildTokenizer = (): Promise<void> => {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     if (tokenizer) return resolve();
-    // GitHub Pagesなどのサブディレクトリデプロイに対応するため、BASE_URLを付与
-    const dicPath = import.meta.env.BASE_URL + 'dict';
-    kuromoji.builder({ dicPath }).build((err, t) => {
-      if (err) return reject(err);
-      tokenizer = t;
-      resolve();
-    });
+    try {
+      const dicPath = import.meta.env.BASE_URL + 'dict';
+      const kuromoji = await loadKuromoji();
+      kuromoji.builder({ dicPath }).build((err, t) => {
+        if (err) return reject(err);
+        tokenizer = t;
+        resolve();
+      });
+    } catch (err) {
+      reject(err);
+    }
   });
 };
 
