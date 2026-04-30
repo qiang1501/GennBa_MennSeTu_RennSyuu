@@ -504,6 +504,57 @@ textarea:focus {
   box-shadow: 0 0 20px var(--neon-green), inset 0 0 20px var(--neon-green);
 }
 
+.form-field {
+  width: 100%;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 0.7rem;
+  color: #fff;
+  font-size: 1.15rem;
+  text-shadow: 0 0 8px var(--neon-blue);
+}
+
+.form-field textarea,
+.form-field input[type="file"] {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-field input[type="file"] {
+  padding: 1rem;
+  border: 2px dashed rgba(0, 255, 255, 0.55);
+  color: var(--neon-blue);
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.input-help,
+.file-name {
+  margin: 0.4rem 0 0;
+  color: #b8ffff;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.generated-field {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px dashed rgba(0, 255, 255, 0.3);
+}
+
+.dify-error {
+  margin-bottom: 1.2rem;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  box-shadow: none;
+}
+
 .loading-indicator {
   display: flex;
   align-items: center;

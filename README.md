@@ -56,6 +56,24 @@ npm run dev
 - `VITE_SUPABASE_AZURE_TTS_URL`
 - `VITE_SUPABASE_ANON_KEY`
 
+## ローカル Dify 連携
+
+最初の画面では、案件情報とスキルシート Excel を Dify に送り、面談練習用の文章を生成します。
+
+`.env` に以下を設定してください。
+
+```bash
+VITE_DIFY_BASE_URL=http://localhost/v1
+VITE_DIFY_API_KEY=your-local-dify-api-key
+```
+
+Dify 側の Workflow 入力変数は以下です。
+
+- `Meet`
+- `excel_file`
+
+この連携はローカル開発用です。`VITE_DIFY_API_KEY` はブラウザ側から見えるため、GitHub Pages などの公開環境では使わないでください。
+
 ## Supabase Functions
 
 ### 1) Transliterate
