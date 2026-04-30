@@ -153,6 +153,10 @@ vi.mock('./utils/diffMatcher', () => ({
   katakanaToHiragana: mockState.katakanaToHiraganaMock,
 }));
 
+vi.mock('./utils/difyClient', () => ({
+  generatePracticeText: vi.fn(async () => 'N1\nJava'),
+}));
+
 vi.mock('./hooks/useSpeechRecognition', async () => {
   const React = await import('react');
 
@@ -180,10 +184,23 @@ const renderAnalyzedApp = async (text: string) => {
   const user = userEvent.setup();
   render(<App />);
 
-  const analyzeButton = await screen.findByRole('button', { name: /分析開始/i });
-  await user.type(screen.getByPlaceholderText(/例：今日はとても暑いです。/i), text);
-  await waitFor(() => expect(analyzeButton).toBeEnabled());
-  await user.click(analyzeButton);
+  await user.type(
+    await screen.findByLabelText('案件情報'),
+    'Java と React の面談練習をしたいです。',
+  );
+  await user.upload(
+    screen.getByLabelText('スキルシート Excel'),
+    new File(['excel'], 'skill-sheet.xlsx', {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    }),
+  );
+  await user.click(screen.getByRole('button', { name: 'Difyで生成' }));
+
+  const generatedText = await screen.findByLabelText('生成文章の確認');
+  await user.clear(generatedText);
+  await user.type(generatedText, text);
+  await user.click(screen.getByRole('button', { name: '分析開始' }));
+
   await waitFor(() => {
     expect(document.querySelector('.line-compare-container')).not.toBeNull();
   });

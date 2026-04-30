@@ -18,7 +18,7 @@ import {
 import { supabaseClient, isSupabaseAuthConfigured } from './utils/supabaseClient';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { extractMistakeWords, type MistakeWord } from './utils/mistakeWords';
-import { TextInputPanel } from './components/TextInputPanel';
+import { DifyInputPanel } from './components/DifyInputPanel';
 import { LivePreview } from './components/LivePreview';
 import { ScorePanel } from './components/ScorePanel';
 import { LineCompare } from './components/LineCompare';
@@ -672,7 +672,7 @@ function App() {
           </>
         ) : (
           <>
-            {!parsedLines && <TextInputPanel onAnalyze={handleAnalyze} isLoading={isInitializing} />}
+            {!parsedLines && <DifyInputPanel onAnalyze={handleAnalyze} isLoading={isInitializing} />}
 
             {parsedLines && !isFinished && (
               <div className="karaoke-container panel">
