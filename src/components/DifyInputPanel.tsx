@@ -3,19 +3,17 @@ import { generatePracticeText } from '../utils/difyClient';
 
 interface DifyInputPanelProps {
   onAnalyze: (text: string) => void | Promise<void>;
+  onGenerate: (text: string) => void;
   isLoading: boolean;
 }
 
-export const DifyInputPanel: React.FC<DifyInputPanelProps> = ({ onAnalyze, isLoading }) => {
+export const DifyInputPanel: React.FC<DifyInputPanelProps> = ({ onAnalyze: _onAnalyze, onGenerate, isLoading }) => {
   const [meet, setMeet] = useState('');
   const [excelFile, setExcelFile] = useState<File | null>(null);
-  const [generatedText, setGeneratedText] = useState('');
-  const [hasGeneratedText, setHasGeneratedText] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const canGenerate = !isLoading && !isGenerating && meet.trim().length > 0 && excelFile !== null;
-  const canAnalyze = !isLoading && !isGenerating && generatedText.trim().length > 0;
 
   const handleGenerate = async () => {
     if (!excelFile || !meet.trim()) return;
@@ -27,19 +25,12 @@ export const DifyInputPanel: React.FC<DifyInputPanelProps> = ({ onAnalyze, isLoa
         meet: meet.trim(),
         file: excelFile,
       });
-      setGeneratedText(text);
-      setHasGeneratedText(true);
+      onGenerate(text);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Difyでの生成に失敗しました。');
     } finally {
       setIsGenerating(false);
     }
-  };
-
-  const handleAnalyze = () => {
-    const text = generatedText.trim();
-    if (!text) return;
-    void onAnalyze(text);
   };
 
   return (
@@ -65,8 +56,6 @@ export const DifyInputPanel: React.FC<DifyInputPanelProps> = ({ onAnalyze, isLoa
           accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
           onChange={(event) => {
             setExcelFile(event.target.files?.[0] ?? null);
-            setGeneratedText('');
-            setHasGeneratedText(false);
             setError(null);
           }}
         />
@@ -85,29 +74,6 @@ export const DifyInputPanel: React.FC<DifyInputPanelProps> = ({ onAnalyze, isLoa
           {isGenerating ? '生成中...' : 'Difyで生成'}
         </button>
       </div>
-
-      {hasGeneratedText && (
-        <div className="form-field generated-field">
-          <label htmlFor="generated-text">生成文章の確認</label>
-          <p className="input-help">必要であれば文章を編集してから分析を開始してください。</p>
-          <textarea
-            id="generated-text"
-            value={generatedText}
-            onChange={(event) => setGeneratedText(event.target.value)}
-            rows={12}
-          />
-          <div className="action-row">
-            <button
-              type="button"
-              className="btn-primary"
-              disabled={!canAnalyze}
-              onClick={handleAnalyze}
-            >
-              分析開始
-            </button>
-          </div>
-        </div>
-      )}
     </section>
   );
 };

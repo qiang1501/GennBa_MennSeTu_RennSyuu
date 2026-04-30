@@ -196,9 +196,10 @@ const renderAnalyzedApp = async (text: string) => {
   );
   await user.click(screen.getByRole('button', { name: 'Difyで生成' }));
 
-  const generatedText = await screen.findByLabelText('生成文章の確認');
-  await user.clear(generatedText);
-  await user.type(generatedText, text);
+  await user.click(await screen.findByRole('button', { name: '編集' }));
+  const generatedTextArea = screen.getByLabelText('生成文章の編集');
+  await user.clear(generatedTextArea);
+  await user.type(generatedTextArea, text);
   await user.click(screen.getByRole('button', { name: '分析開始' }));
 
   await waitFor(() => {

@@ -703,3 +703,90 @@ button:disabled {
   font-size: 2rem;
   padding: 1.5rem 4rem;
 }
+
+/* Generated Text Review Page */
+.generated-review-panel {
+  text-align: left;
+}
+
+.generated-review-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+
+.generated-review-header h2 {
+  margin: 0;
+  color: #fff;
+  text-shadow: 0 0 10px #fff, 0 0 20px var(--neon-blue);
+  font-size: 1.6rem;
+  flex: 1;
+  text-align: center;
+}
+
+.back-btn {
+  font-size: 1rem;
+  padding: 0.6rem 1.2rem;
+  white-space: nowrap;
+}
+
+.edit-toggle-btn {
+  font-size: 1rem;
+  padding: 0.6rem 1.2rem;
+  white-space: nowrap;
+}
+
+.generated-review-help {
+  color: #9afcff;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+.generated-review-text {
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(0, 255, 255, 0.3);
+  padding: 2rem 2.5rem;
+  min-height: 300px;
+  margin-bottom: 2rem;
+  line-height: 2.2;
+}
+
+.generated-review-text p {
+  margin: 0 0 1.2em 0;
+  color: var(--neon-green);
+  font-size: 1.4rem;
+  text-shadow: 0 0 6px rgba(57, 255, 20, 0.5);
+  text-align: left;
+}
+
+.generated-review-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.6);
+  color: var(--neon-green);
+  border: 2px solid var(--neon-blue);
+  padding: 1.5rem;
+  font-family: var(--font-retro);
+  font-size: 1.2rem;
+  line-height: 2;
+  resize: vertical;
+  margin-bottom: 2rem;
+  min-height: 320px;
+}
+
+.generated-review-textarea:focus {
+  outline: none;
+  border-color: #fff;
+  box-shadow: 0 0 12px var(--neon-blue);
+}
+
+.generated-review-action {
+  justify-content: center;
+}
+
+.generated-review-action button {
+  font-size: 1.4rem;
+  padding: 1rem 3rem;
+}

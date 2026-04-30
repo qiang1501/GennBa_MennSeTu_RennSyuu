@@ -19,6 +19,7 @@ import { supabaseClient, isSupabaseAuthConfigured } from './utils/supabaseClient
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { extractMistakeWords, type MistakeWord } from './utils/mistakeWords';
 import { DifyInputPanel } from './components/DifyInputPanel';
+import { GeneratedTextReview } from './components/GeneratedTextReview';
 import { LivePreview } from './components/LivePreview';
 import { ScorePanel } from './components/ScorePanel';
 import { LineCompare } from './components/LineCompare';
@@ -51,6 +52,7 @@ function App() {
   const [lastLiveTextUpdateAt, setLastLiveTextUpdateAt] = useState<number | null>(null);
   const [englishReadings, setEnglishReadings] = useState<ReadingDictionary>(() => dictionaryFromEnglishMap({}));
   const [isCustomReadingPage, setIsCustomReadingPage] = useState(false);
+  const [generatedText, setGeneratedText] = useState<string | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [customReadingItems, setCustomReadingItems] = useState<CustomReadingItem[]>([]);
   const [isCustomReadingLoading, setIsCustomReadingLoading] = useState(false);
@@ -472,6 +474,7 @@ function App() {
     advanceRecordingSession();
     stopRecognitionIfActive();
     setIsCustomReadingPage(false);
+    setGeneratedText(null);
     setParsedLines(null);
     setEnglishReadings(dictionaryFromEnglishMap({}));
     setLineResults([]);
@@ -672,7 +675,22 @@ function App() {
           </>
         ) : (
           <>
-            {!parsedLines && <DifyInputPanel onAnalyze={handleAnalyze} isLoading={isInitializing} />}
+            {!parsedLines && !generatedText && (
+              <DifyInputPanel
+                onAnalyze={handleAnalyze}
+                onGenerate={(text) => setGeneratedText(text)}
+                isLoading={isInitializing}
+              />
+            )}
+
+            {!parsedLines && generatedText && (
+              <GeneratedTextReview
+                text={generatedText}
+                onAnalyze={handleAnalyze}
+                onBack={() => setGeneratedText(null)}
+                isLoading={isInitializing}
+              />
+            )}
 
             {parsedLines && !isFinished && (
               <div className="karaoke-container panel">
