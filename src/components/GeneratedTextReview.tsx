@@ -3,7 +3,7 @@ import { buildPracticeScript, parseInterviewMaterial } from '../utils/interviewM
 
 interface GeneratedTextReviewProps {
   text: string;
-  onAnalyze: (text: string) => void | Promise<void>;
+  onAnalyze: (text: string, context?: { title: string; point?: string }) => void | Promise<void>;
   onBack: () => void;
   isLoading: boolean;
 }
@@ -23,10 +23,10 @@ export const GeneratedTextReview: React.FC<GeneratedTextReviewProps> = ({
   const allScript = buildPracticeScript([introScript, ...answerScripts]);
   const canAnalyze = !isLoading && allScript.length > 0;
 
-  const handleAnalyze = (script: string) => {
+  const handleAnalyze = (script: string, context?: { title: string; point?: string }) => {
     const text = script.trim();
     if (!text) return;
-    void onAnalyze(text);
+    void onAnalyze(text, context);
   };
 
   return (
@@ -72,7 +72,7 @@ export const GeneratedTextReview: React.FC<GeneratedTextReviewProps> = ({
                 type="button"
                 className="btn-primary compact-action"
                 disabled={isLoading || !introScript.trim()}
-                onClick={() => handleAnalyze(introScript)}
+                onClick={() => handleAnalyze(introScript, { title: '自己紹介' })}
               >
                 練習する
               </button>
@@ -89,7 +89,7 @@ export const GeneratedTextReview: React.FC<GeneratedTextReviewProps> = ({
               type="button"
               className="btn-primary compact-action"
               disabled={!canAnalyze}
-              onClick={() => handleAnalyze(allScript)}
+              onClick={() => handleAnalyze(allScript, { title: '自己紹介 + 想定問答10個' })}
             >
               全部まとめて練習
             </button>
@@ -108,7 +108,10 @@ export const GeneratedTextReview: React.FC<GeneratedTextReviewProps> = ({
                   type="button"
                   className="btn-secondary compact-action"
                   disabled={isLoading}
-                  onClick={() => handleAnalyze(item.answer)}
+                  onClick={() => handleAnalyze(item.answer, {
+                    title: `${item.number}. ${item.question}`,
+                    point: item.point,
+                  })}
                 >
                   回答を練習
                 </button>
@@ -158,7 +161,7 @@ export const GeneratedTextReview: React.FC<GeneratedTextReviewProps> = ({
           type="button"
           className="btn-primary"
           disabled={!canAnalyze}
-          onClick={() => handleAnalyze(allScript)}
+          onClick={() => handleAnalyze(allScript, { title: '自己紹介 + 想定問答10個' })}
         >
           {isEditing ? '分析開始' : '自己紹介と10問を練習開始'}
         </button>

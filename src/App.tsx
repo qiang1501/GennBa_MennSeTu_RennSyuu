@@ -34,6 +34,11 @@ const PARTICLE_SURFACES = new Set([
 ]);
 const PAUSE_PUNCTUATION_REGEX = /^[、。,.!?！？]$/;
 
+type PracticeContext = {
+  title: string;
+  point?: string;
+};
+
 function App() {
   const [isInitializing, setIsInitializing] = useState(true);
   const [initError, setInitError] = useState<string | null>(null);
@@ -53,6 +58,7 @@ function App() {
   const [englishReadings, setEnglishReadings] = useState<ReadingDictionary>(() => dictionaryFromEnglishMap({}));
   const [isCustomReadingPage, setIsCustomReadingPage] = useState(false);
   const [generatedText, setGeneratedText] = useState<string | null>(null);
+  const [practiceContext, setPracticeContext] = useState<PracticeContext | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [customReadingItems, setCustomReadingItems] = useState<CustomReadingItem[]>([]);
   const [isCustomReadingLoading, setIsCustomReadingLoading] = useState(false);
@@ -446,7 +452,7 @@ function App() {
     setIsCustomReadingPage((prev) => !prev);
   }, []);
 
-  const handleAnalyze = async (text: string) => {
+  const handleAnalyze = async (text: string, context?: PracticeContext) => {
     try {
       const convertedReadings = await loadReadingDictionary(text);
       const lines = parseTextToLines(text, convertedReadings);
@@ -463,6 +469,7 @@ function App() {
         setLastLiveTextUpdateAt(null);
         setIsUserRecording(false);
         setIsFinished(false);
+        setPracticeContext(context ?? null);
       }
     } catch (e) {
       console.error(e);
@@ -475,6 +482,7 @@ function App() {
     stopRecognitionIfActive();
     setIsCustomReadingPage(false);
     setGeneratedText(null);
+    setPracticeContext(null);
     setParsedLines(null);
     setEnglishReadings(dictionaryFromEnglishMap({}));
     setLineResults([]);
@@ -504,6 +512,7 @@ function App() {
     advanceRecordingSession();
     stopRecognitionIfActive();
     setParsedLines(null);
+    setPracticeContext(null);
     setEnglishReadings(dictionaryFromEnglishMap({}));
     setLineResults([]);
     setMistakeWords([]);
@@ -728,6 +737,18 @@ function App() {
                     ← 前のページへ
                   </button>
                 </div>
+                {practiceContext && (
+                  <section className="practice-context-panel">
+                    <p className="practice-context-label">問題</p>
+                    <h2>{practiceContext.title}</h2>
+                    {practiceContext.point && (
+                      <>
+                        <p className="practice-context-label">回答のポイント</p>
+                        <p className="practice-context-point">{practiceContext.point}</p>
+                      </>
+                    )}
+                  </section>
+                )}
                 <div className="lines-display" onMouseLeave={handleLeaveLines}>
                   {parsedLines.map((line, idx) => (
                     <LineCompare
