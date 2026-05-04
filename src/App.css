@@ -40,7 +40,7 @@ body::after {
 }
 
 .App {
-  max-width: 900px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 3rem 1.5rem;
   display: flex;
@@ -53,6 +53,10 @@ body::after {
 /* Header */
 .header {
   margin-bottom: 3rem;
+  width: 100%;
+}
+
+.main-content {
   width: 100%;
 }
 
@@ -103,6 +107,31 @@ body::after {
   background: var(--neon-pink);
   color: #06010a;
   box-shadow: 0 0 24px var(--neon-pink);
+}
+
+.scroll-top-btn {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 10000;
+  width: 58px;
+  height: 58px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-color: var(--neon-blue);
+  color: var(--neon-blue);
+  background: rgba(5, 5, 5, 0.86);
+  box-shadow: 0 0 14px var(--neon-blue), inset 0 0 10px rgba(0, 255, 255, 0.28);
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.scroll-top-btn:hover {
+  background: var(--neon-blue);
+  color: #001015;
+  box-shadow: 0 0 24px var(--neon-blue);
 }
 
 @keyframes flicker {
@@ -524,6 +553,18 @@ textarea:focus {
   box-sizing: border-box;
 }
 
+.dify-input-panel {
+  max-width: 1100px;
+  width: 100%;
+}
+
+.dify-input-panel .form-field textarea {
+  display: block;
+  max-width: none;
+  min-width: 100%;
+  height: 250px;
+}
+
 .form-field input[type="file"] {
   padding: 1rem;
   border: 2px dashed rgba(0, 255, 255, 0.55);
@@ -707,6 +748,7 @@ button:disabled {
 /* Generated Text Review Page */
 .generated-review-panel {
   text-align: left;
+  max-width: 1100px;
 }
 
 .generated-review-header {
@@ -717,19 +759,36 @@ button:disabled {
   gap: 1rem;
 }
 
-.generated-review-header h2 {
-  margin: 0;
+.generated-review-title {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  text-align: center;
+}
+
+.generated-review-title span {
+  color: #9afcff;
+  font-size: 1rem;
+}
+
+.generated-review-title strong {
   color: #fff;
   text-shadow: 0 0 10px #fff, 0 0 20px var(--neon-blue);
   font-size: 1.6rem;
-  flex: 1;
-  text-align: center;
 }
 
 .back-btn {
   font-size: 1rem;
   padding: 0.6rem 1.2rem;
   white-space: nowrap;
+}
+
+.page-back-row {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 1.25rem;
 }
 
 .edit-toggle-btn {
@@ -742,6 +801,7 @@ button:disabled {
   color: #9afcff;
   margin-bottom: 1.5rem;
   font-size: 1rem;
+  text-align: center;
 }
 
 .generated-review-text {
@@ -789,4 +849,198 @@ button:disabled {
 .generated-review-action button {
   font-size: 1.4rem;
   padding: 1rem 3rem;
+}
+
+.interview-practice-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.practice-card {
+  background: rgba(0, 20, 28, 0.72);
+  border: 2px solid rgba(0, 255, 255, 0.45);
+  box-shadow: inset 0 0 12px rgba(0, 255, 255, 0.16);
+  padding: 1.25rem;
+}
+
+.practice-card-header,
+.practice-summary-row,
+.qa-practice-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  align-items: start;
+}
+
+.practice-kicker {
+  color: var(--neon-green);
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+}
+
+.practice-card h3 {
+  color: #fff;
+  margin: 0 0 0.75rem;
+  font-size: 1.35rem;
+  line-height: 1.45;
+  text-shadow: 0 0 8px rgba(0, 255, 255, 0.7);
+}
+
+.practice-answer {
+  color: #d8ffff;
+  font-size: 1.08rem;
+  line-height: 1.9;
+  margin: 0;
+  white-space: pre-line;
+}
+
+.practice-point {
+  color: #9affc8;
+  border-left: 3px solid var(--neon-green);
+  margin: 1rem 0 0;
+  padding-left: 0.8rem;
+  line-height: 1.7;
+}
+
+.practice-summary-row {
+  border: 2px dashed rgba(57, 255, 20, 0.45);
+  padding: 1rem 1.25rem;
+  align-items: center;
+  color: #d8ffff;
+  background: rgba(57, 255, 20, 0.08);
+}
+
+.practice-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  margin-right: 0.65rem;
+  color: #00190a;
+  background: var(--neon-green);
+  box-shadow: 0 0 12px rgba(57, 255, 20, 0.7);
+  font-weight: 700;
+}
+
+.qa-practice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.qa-practice-card {
+  grid-template-columns: 3rem 1fr auto;
+  align-items: start;
+}
+
+.qa-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  color: #001018;
+  background: var(--neon-blue);
+  box-shadow: 0 0 14px rgba(0, 255, 255, 0.7);
+  font-weight: 700;
+}
+
+.qa-body {
+  min-width: 0;
+}
+
+.compact-action {
+  font-size: 1rem;
+  padding: 0.75rem 1rem;
+  white-space: nowrap;
+  align-self: start;
+}
+
+.extra-material-section {
+  margin-top: 1.75rem;
+  padding-top: 1.5rem;
+  border-top: 2px dashed rgba(0, 255, 255, 0.35);
+}
+
+.extra-material-heading {
+  margin-bottom: 1rem;
+}
+
+.extra-material-heading span {
+  color: var(--neon-green);
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+}
+
+.extra-material-heading h3 {
+  color: #fff;
+  font-size: 1.35rem;
+  margin: 0.25rem 0 0;
+  text-shadow: 0 0 8px rgba(0, 255, 255, 0.65);
+}
+
+.extra-material-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.extra-material-card {
+  background: rgba(3, 10, 15, 0.78);
+  border: 2px solid rgba(57, 255, 20, 0.32);
+  padding: 1.1rem;
+}
+
+.extra-material-card h4 {
+  color: #d8ffff;
+  margin: 0 0 0.75rem;
+  font-size: 1.15rem;
+  line-height: 1.45;
+}
+
+.extra-material-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.extra-material-body p {
+  color: #b8ffff;
+  margin: 0;
+  line-height: 1.75;
+  font-size: 1rem;
+}
+
+@media (max-width: 760px) {
+  .generated-review-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .generated-review-title {
+    text-align: left;
+  }
+
+  .practice-card-header,
+  .practice-summary-row,
+  .qa-practice-card {
+    grid-template-columns: 1fr;
+  }
+
+  .qa-practice-card {
+    gap: 0.75rem;
+  }
+
+  .compact-action,
+  .generated-review-action button {
+    width: 100%;
+    white-space: normal;
+  }
+
+  .extra-material-list {
+    grid-template-columns: 1fr;
+  }
 }

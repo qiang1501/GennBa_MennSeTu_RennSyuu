@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 .env
+.tools/
 .worktrees/
 
 # Editor directories and files

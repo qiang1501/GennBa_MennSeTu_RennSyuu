@@ -5,6 +5,7 @@ interface ScoreProps {
   correctChars: number;
   onReset: () => void;
   onRetry: () => void;
+  onBack?: () => void;
   onPracticeMistakes?: () => void;
   mistakeWordCount?: number;
 }
@@ -12,6 +13,7 @@ interface ScoreProps {
 export const ScorePanel: React.FC<ScoreProps> = ({
   totalChars,
   correctChars,
+  onBack,
   onReset,
   onRetry,
   onPracticeMistakes,
@@ -21,6 +23,13 @@ export const ScorePanel: React.FC<ScoreProps> = ({
   
   return (
     <div className="score-panel panel">
+      {onBack && (
+        <div className="page-back-row">
+          <button type="button" className="btn-secondary back-btn" onClick={onBack}>
+            ← 前のページへ
+          </button>
+        </div>
+      )}
       <h2>🎉 結果発表 🎉</h2>
       <div className="score-details">
         <p>総判定文字数: <strong>{totalChars}</strong></p>

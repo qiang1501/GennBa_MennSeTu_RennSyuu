@@ -500,6 +500,31 @@ function App() {
     setIsFinished(false);
   };
 
+  const handleBackFromPractice = useCallback(() => {
+    advanceRecordingSession();
+    stopRecognitionIfActive();
+    setParsedLines(null);
+    setEnglishReadings(dictionaryFromEnglishMap({}));
+    setLineResults([]);
+    setMistakeWords([]);
+    setSelectedLineIndex(null);
+    setRecordingLineIndex(null);
+    setCurrentLineTranscript('');
+    setLastLiveTextUpdateAt(null);
+    setIsUserRecording(false);
+    setIsFinished(false);
+  }, [advanceRecordingSession, stopRecognitionIfActive]);
+
+  const handleBackFromScore = useCallback(() => {
+    advanceRecordingSession();
+    stopRecognitionIfActive();
+    setRecordingLineIndex(null);
+    setCurrentLineTranscript('');
+    setLastLiveTextUpdateAt(null);
+    setIsUserRecording(false);
+    setIsFinished(false);
+  }, [advanceRecordingSession, stopRecognitionIfActive]);
+
   const handleFinish = useCallback(() => {
     const {
       recordingLineIndex: activeRecordingLine,
@@ -539,6 +564,10 @@ function App() {
     const practiceText = mistakeWords.map((word) => word.surface).join('\n');
     await handleAnalyze(practiceText);
   }, [mistakeWords]);
+
+  const handleScrollTop = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   const stopCurrentPlayback = useCallback(() => {
     const audio = playbackAudioRef.current;
@@ -694,6 +723,11 @@ function App() {
 
             {parsedLines && !isFinished && (
               <div className="karaoke-container panel">
+                <div className="page-back-row">
+                  <button type="button" className="btn-secondary back-btn" onClick={handleBackFromPractice}>
+                    ← 前のページへ
+                  </button>
+                </div>
                 <div className="lines-display" onMouseLeave={handleLeaveLines}>
                   {parsedLines.map((line, idx) => (
                     <LineCompare
@@ -725,6 +759,7 @@ function App() {
               <ScorePanel
                 totalChars={totalScoreChars}
                 correctChars={correctScoreChars}
+                onBack={handleBackFromScore}
                 onReset={handleReset}
                 onRetry={handleRetry}
                 onPracticeMistakes={handlePracticeMistakes}
@@ -734,6 +769,16 @@ function App() {
           </>
         )}
       </main>
+
+      <button
+        type="button"
+        className="scroll-top-btn"
+        aria-label="ページ上部へ戻る"
+        title="ページ上部へ戻る"
+        onClick={handleScrollTop}
+      >
+        ↑
+      </button>
     </div>
   );
 }
