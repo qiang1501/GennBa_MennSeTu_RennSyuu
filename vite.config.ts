@@ -58,4 +58,14 @@ const serveKuromojiDictRaw = () => ({
 export default defineConfig({
   plugins: [serveKuromojiDictRaw(), react()],
   base,
+  server: {
+    proxy: {
+      '/api/dify': {
+        target: 'https://api.dify.ai',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (requestPath) => requestPath.replace(/^\/api\/dify/, '/v1'),
+      },
+    },
+  },
 });
